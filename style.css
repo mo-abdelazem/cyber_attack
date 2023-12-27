@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'P2p';
-  src: url('/assets/fonts/PressStart2P-Regular.ttf');
+  src: url('./assets/fonts/PressStart2P-Regular.ttf');
 }
 
 * {
