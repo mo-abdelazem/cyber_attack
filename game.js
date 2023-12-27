@@ -195,10 +195,10 @@ class Game {
     fieldStyle.width = '100%';
     fieldStyle.height = '100%';
 
-    this.audio = new Audio('assets/sound/fire.mp3');
-    this.catchAudio = new Audio('assets/sound/catch.wav');
-    this.catchRedAudio = new Audio('/.assets/sound/red.mp3');
-    this.loseAudio = new Audio('/.assets/sound/lose.wav');
+    this.audio = new Audio('./assets/sound/fire.mp3');
+    this.catchAudio = new Audio('./assets/sound/catch.wav');
+    this.catchRedAudio = new Audio('./assets/sound/red.mp3');
+    this.loseAudio = new Audio('./assets/sound/lose.wav');
     this.winAudio = new Audio('./assets/sound/win.mp3');
 
     this.body.appendChild(this.battlefield);
