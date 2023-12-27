@@ -1,0 +1,81 @@
+@font-face {
+  font-family: 'P2p';
+  src: url('/assets/fonts/PressStart2P-Regular.ttf');
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'P2p', sans-serif;
+}
+
+#battlefield,
+#start_game_container {
+  position: relative;
+  color: #eceffa;
+  background-image: url(assets/images/background.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  cursor: crosshair;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* start of welcome screen page  */
+#start_game_container {
+  background-image: url(assets/images/welcome_screen.jpg);
+
+  & section {
+    max-width: 1080px;
+    width: 100%;
+    padding: 18px;
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0a0f22be;
+
+    & h1 {
+      text-align: center;
+      font-size: 32px;
+      line-height: 1.5;
+    }
+    & label {
+      display: inline-block;
+      margin-top: 18px;
+    }
+    & input,
+    & select {
+      max-width: 250px;
+      width: 100%;
+      padding: 8px;
+      margin: 30px 0 0 0px;
+      border: none;
+      outline: none;
+      background-color: #0a0f22de;
+      color: white;
+    }
+
+    & select {
+      text-align: center;
+    }
+  }
+  & button {
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    width: 350px;
+    height: 50px;
+    transform: translate(-50%, -50%);
+    background-color: #0a0f22de;
+    color: white;
+    border-color: white;
+  }
+  & button:hover {
+    cursor: pointer;
+    background-color: #0a0f2265;
+  }
+}
+/* end of welcome screen page  */
