@@ -1,11 +1,9 @@
-// window.addEventListener('load', function () {
-// Your existing code here
 const playerName = localStorage.getItem(
   'name_' + localStorage.getItem('LoginId')
 );
-const gameLevel = localStorage.getItem('level');
+const gameLevel = localStorage.getItem('Level');
 const defenderSpeed = 50;
-const bulletSpeed = -5;
+const bulletSpeed = -20;
 
 document.body.id = 'start_game_container';
 GameOverDialog(
@@ -25,14 +23,19 @@ class Enemy {
     // define enemy
     this.enemy = document.createElement('img');
     this.enemy.style.position = 'absolute';
-    // this.enemy.src = 'assets/images/cyber-1.png';
+    // this.enemy.style.top = '50px';
     this.enemy.src = imageSrc;
-    this.enemy.width = '75';
+    this.enemy.width = '50';
     this.score = score;
 
     // append enemy
     battlefield.appendChild(this.enemy);
     arrEnemy.push(this);
+  }
+
+  // Add methods to move and update the enemy
+  moveDown() {
+    this.enemy.style.top = parseInt(this.enemy.style.top) + 1 + 'px';
   }
 }
 class Bullet {
@@ -85,23 +88,26 @@ class Bullet {
                   collisionNear(arrEnemy[i].enemy, arrEnemy[j].enemy) &&
                   i != j
                 ) {
+                  Game.boxDestroyed += 1;
                   arrEnemy[j].enemy.remove();
                 }
               }
               game.scoreGame += 15;
               game.catchRedAudio.play();
               arrEnemy[i].enemy.remove();
+              Game.boxDestroyed += 1;
               arrEnemy.splice(i, 1);
             } else if (arrEnemy[i].enemy.src.endsWith('cyber-1.png')) {
               arrEnemy[i].enemy.src = 'assets/images/cyber-2.png';
               game.scoreGame += 1;
             } else {
               game.scoreGame += 1;
+              Game.boxDestroyed += 1;
               game.catchAudio.play();
               arrEnemy[i].enemy.remove();
               arrEnemy.splice(i, 1);
             }
-            if (game.scoreGame >= 300 && game.callEnd == 0) {
+            if (Game.boxDestroyed == 300) {
               game.endGame();
             }
             game.scorePoints.innerText = ` ${game.scoreGame} points`;
@@ -117,8 +123,8 @@ class Bullet {
         let n = findthisIndes(arrBullet, this);
         arrBullet.splice(n, 1);
       }
-      console.log(this);
-    }, 20);
+      console.log(Game.boxDestroyed);
+    }, 50);
   }
 }
 
@@ -130,6 +136,7 @@ class DefenderFighter {
     this.defenderFighter.alt = 'Defender Fighter';
     this.battlefield = battlefield;
     this.defenderFighter.style.position = 'absolute';
+    this.defenderFighter.style.width = '75px';
     this.defenderFighter.style.bottom = '50px';
     this.defenderFighter.style.left = '50%';
     this.defenderFighter.style.transform = `translateX(${-50}%)`;
@@ -137,7 +144,7 @@ class DefenderFighter {
   }
 
   moveLeft() {
-    if (this.defenderFighter.offsetLeft - defenderSpeed > 0) {
+    if (this.defenderFighter.offsetLeft - defenderSpeed > 50) {
       this.defenderFighter.style.left = `${
         this.defenderFighter.offsetLeft - defenderSpeed
       }px`;
@@ -147,7 +154,7 @@ class DefenderFighter {
   moveRight() {
     if (
       this.defenderFighter.offsetLeft + this.defenderFighter.offsetWidth <
-      this.battlefield.offsetWidth
+      this.battlefield.offsetWidth - 75
     ) {
       this.defenderFighter.style.left = `${
         this.defenderFighter.offsetLeft + defenderSpeed
@@ -162,8 +169,8 @@ class DefenderFighter {
 }
 
 class Game {
+  static boxDestroyed = 0;
   constructor() {
-    this.callEnd = 0;
     this.timerElement = document.createElement('div');
     this.timerElement.innerText = '02:00';
     this.timerStyle = this.timerElement.style;
@@ -232,10 +239,13 @@ class Game {
     // moving Fighter
     document.addEventListener('keydown', keydownHandle);
     document.addEventListener('keyup', keyupHandle);
+
+    setTimeout(function () {
+      setInterval(myFunction, localStorage.getItem('Level') * 1000);
+    }, localStorage.getItem('Level') * 1000 * 7);
   }
 
   endGame() {
-    this.callEnd = 1;
     clearInterval(this.timerInterval);
     clearInterval(this.createEnemyRowInterval);
     document.removeEventListener('keydown', keydownHandle);
@@ -246,9 +256,7 @@ class Game {
         'score_' + localStorage.getItem('LoginId'),
         this.scoreGame
       );
-      if (
-        localStorage.getItem('score_' + localStorage.getItem('LoginId')) < 300
-      ) {
+      if (Game.boxDestroyed < 300) {
         this.loseAudio.play();
         GameOverDialog(
           this.battlefield,
@@ -256,7 +264,7 @@ class Game {
           this.scoreGame,
           'playAgain',
           'Play Again',
-          'endzz'
+          'endOver'
         );
       } else {
         this.winAudio.play();
@@ -266,19 +274,23 @@ class Game {
           this.scoreGame,
           'playAgain',
           'Play Again',
-          'endzz'
+          'endWin'
         );
       }
     }, 1500);
   }
 
   createEnemyRow() {
-    const enemyWidth = 96; // Update this value based on your actual enemy width
+    const enemyWidth = 50; // Update this value based on your actual enemy width
     const spaceBetweenEnemies = 10; // Adjust this value as needed
 
-    const numberOfEnemies = Math.floor(
-      this.battlefield.offsetWidth / (enemyWidth + spaceBetweenEnemies)
-    );
+    let numberOfEnemies =
+      Math.floor(
+        this.battlefield.offsetWidth / (enemyWidth + spaceBetweenEnemies)
+      ) - 2;
+    // if (numberOfEnemies > 14) {
+    //   numberOfEnemies = 14;
+    // }
     // Calculate the total width occupied by enemies and spaces
     const totalRowWidth =
       numberOfEnemies * enemyWidth +
@@ -291,8 +303,7 @@ class Game {
       // Choose a random image source and score for the enemy
       let randomImageSrc;
       let randomScore;
-      let boomProbability = gameLevel === 1 ? 0.1 : 0.05;
-
+      let boomProbability = gameLevel == 10 ? 0.15 : 0.05;
       let randomPlace = Math.floor(Math.random() * 2);
       if (i % 2 === randomPlace && Math.random() < boomProbability) {
         // For odd columns, replace with 'assets/images/cyber-boom.png' with 50% probability
@@ -303,14 +314,11 @@ class Game {
         randomImageSrc = getRandomImageSource(this.gameLevel, i);
         randomScore = getRandomScore(randomImageSrc);
       }
-
       const enemy = new Enemy(this.battlefield, randomImageSrc, randomScore);
-
       // Set the position of each enemy in the row with space between enemies
       const enemyPosition =
         startingPosition + i * (enemyWidth + spaceBetweenEnemies);
       enemy.enemy.style.left = `${enemyPosition}px`;
-
       enemyRow.push(enemy);
     }
 
